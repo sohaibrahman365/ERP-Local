@@ -1,0 +1,29 @@
+{
+  "name": "wise-platform",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "clean": "turbo run clean",
+    "db:migrate": "npm run migrate --workspace=@wise/database",
+    "db:generate": "npm run generate --workspace=@wise/database",
+    "db:seed": "npm run seed --workspace=@wise/database",
+    "db:studio": "npm run studio --workspace=@wise/database"
+  },
+  "devDependencies": {
+    "turbo": "^2.3.0",
+    "typescript": "^5.5.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "packageManager": "npm@10.0.0"
+}
