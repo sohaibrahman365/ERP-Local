@@ -26,7 +26,12 @@ export const io = new SocketServer(server, {
 
 // Global middleware
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(",")
+    : ["http://localhost:3000"],
+  credentials: true,
+}));
 app.use(morgan("combined"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
@@ -51,7 +56,7 @@ app.use("/api/v1/admin", adminRouter);
 // Error handler (must be last)
 app.use(errorHandler);
 
-const PORT = process.env.API_PORT ?? 4000;
+const PORT = process.env.PORT ?? process.env.API_PORT ?? 4000;
 server.listen(PORT, () => {
   console.log(`[API] Server running on port ${PORT}`);
 });

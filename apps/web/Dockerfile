@@ -2,7 +2,7 @@ FROM node:20-alpine AS base
 
 # ------- Dependencies -------
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
 # Copy root package files
@@ -16,6 +16,7 @@ RUN npm ci --legacy-peer-deps
 
 # ------- Builder -------
 FROM base AS builder
+RUN apk add --no-cache openssl
 WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
@@ -23,6 +24,10 @@ COPY . .
 
 # Generate Prisma client (needed by shared schemas)
 RUN npx prisma generate --schema=packages/database/prisma/schema.prisma
+
+# Accept API URL at build time (Next.js inlines NEXT_PUBLIC_* during build)
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 
 # Build with Turborepo — only the web app and its dependencies
 RUN npx turbo run build --filter=@wise/web
