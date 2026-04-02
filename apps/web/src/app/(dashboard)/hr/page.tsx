@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button, Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@wise/ui";
 import { api } from "@/lib/api";
 import { UserCog, Clock, CalendarDays } from "lucide-react";
+import Link from "next/link";
 
 export default function HrPage() {
   const { data: empData } = useQuery({
@@ -51,8 +52,12 @@ export default function HrPage() {
             <Clock className="h-4 w-4" />
           </CardHeader>
           <CardContent className="space-y-2">
-            <Button variant="outline" size="sm" className="w-full">View Attendance</Button>
-            <Button variant="outline" size="sm" className="w-full">Payroll History</Button>
+            <Link href="/hr/attendance">
+              <Button variant="outline" size="sm" className="w-full">View Attendance</Button>
+            </Link>
+            <Link href="/hr/payroll">
+              <Button variant="outline" size="sm" className="w-full">Payroll History</Button>
+            </Link>
           </CardContent>
         </Card>
       </div>

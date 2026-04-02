@@ -24,7 +24,9 @@ export default function ProductsPage() {
           <h1 className="text-3xl font-bold">Products</h1>
           <p className="text-muted-foreground">Manage inventory across all verticals</p>
         </div>
-        <Button><Plus className="h-4 w-4 mr-2" />Add Product</Button>
+        <Link href="/products/new">
+          <Button><Plus className="h-4 w-4 mr-2" />Add Product</Button>
+        </Link>
       </div>
 
       <Card>
@@ -41,8 +43,12 @@ export default function ProductsPage() {
             </TableHeader>
             <TableBody>
               {products.map((product: { id: string; name: string; sku: string; basePrice: number; status: string; category?: { name: string } }) => (
-                <TableRow key={product.id}>
-                  <TableCell className="font-medium">{product.name}</TableCell>
+                <TableRow key={product.id} className="cursor-pointer">
+                  <TableCell className="font-medium">
+                    <Link href={`/products/${product.id}`} className="hover:underline">
+                      {product.name}
+                    </Link>
+                  </TableCell>
                   <TableCell>{product.sku}</TableCell>
                   <TableCell>PKR {Number(product.basePrice).toLocaleString()}</TableCell>
                   <TableCell>

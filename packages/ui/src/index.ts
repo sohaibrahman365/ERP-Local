@@ -3,4 +3,9 @@ export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
 export { Input, type InputProps } from "./components/input";
 export { Badge, type BadgeProps, badgeVariants } from "./components/badge";
 export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "./components/table";
+export { Label, type LabelProps } from "./components/label";
+export { Textarea, type TextareaProps } from "./components/textarea";
+export { Select, type SelectProps } from "./components/select";
+export { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "./components/dialog";
+export { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/tabs";
 export { cn } from "./lib/utils";

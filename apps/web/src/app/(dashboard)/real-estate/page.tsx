@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from "@wise/ui";
 import { api } from "@/lib/api";
 import { Plus, Building2 } from "lucide-react";
+import Link from "next/link";
 
 export default function RealEstatePage() {
   const { data: projectsData } = useQuery({
@@ -20,12 +21,18 @@ export default function RealEstatePage() {
           <h1 className="text-3xl font-bold">OZ Developers</h1>
           <p className="text-muted-foreground">Real estate projects, units, and bookings</p>
         </div>
-        <Button><Plus className="h-4 w-4 mr-2" />New Project</Button>
+        <div className="flex gap-2">
+          <Link href="/real-estate/bookings">
+            <Button variant="outline">Bookings</Button>
+          </Link>
+          <Button><Plus className="h-4 w-4 mr-2" />New Project</Button>
+        </div>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         {projects.map((p: { id: string; name: string; status: string; projectType: string; constructionPct: number; totalUnits: number; _count?: { units: number } }) => (
-          <Card key={p.id}>
+          <Link key={p.id} href={`/real-estate/${p.id}`} className="block">
+          <Card className="hover:shadow-md transition-shadow cursor-pointer">
             <CardHeader className="flex flex-row items-center gap-4">
               <Building2 className="h-8 w-8 text-primary" />
               <div>
@@ -49,6 +56,7 @@ export default function RealEstatePage() {
               </div>
             </CardContent>
           </Card>
+          </Link>
         ))}
         {projects.length === 0 && (
           <Card className="col-span-full">

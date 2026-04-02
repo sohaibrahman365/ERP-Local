@@ -55,8 +55,12 @@ export default function FinancePage() {
             <FileText className="h-4 w-4" />
           </CardHeader>
           <CardContent className="space-y-2">
-            <Button variant="outline" size="sm" className="w-full">New Invoice</Button>
-            <Button variant="outline" size="sm" className="w-full">Record Payment</Button>
+            <Link href="/finance/invoices/new">
+              <Button variant="outline" size="sm" className="w-full">New Invoice</Button>
+            </Link>
+            <Link href="/finance/payments">
+              <Button variant="outline" size="sm" className="w-full">Record Payment</Button>
+            </Link>
           </CardContent>
         </Card>
       </div>
