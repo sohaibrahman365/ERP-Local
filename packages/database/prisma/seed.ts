@@ -207,6 +207,97 @@ async function main() {
     data: { tenantId: tenant.id, productId: product2.id, locationId: warehouse.id, qtyOnHand: 30 },
   });
 
+  // Sample SERVICE item
+  const service1 = await prisma.product.create({
+    data: {
+      tenantId: tenant.id,
+      name: "Phone Screen Repair",
+      slug: "phone-screen-repair",
+      sku: "SVC-SCR-RPR",
+      categoryId: mobiles.id,
+      itemType: "SERVICE",
+      uom: "PCS",
+      isTrackInventory: false,
+      basePrice: 5000,
+      costPrice: 2000,
+      taxRatePct: 17,
+      status: "ACTIVE",
+      shortDesc: "Professional screen replacement service",
+    },
+  });
+
+  // Sample RAW_MATERIAL item
+  const rawMaterial1 = await prisma.product.create({
+    data: {
+      tenantId: tenant.id,
+      name: "LCD Display Panel 6.7\"",
+      slug: "lcd-display-panel-67",
+      sku: "RAW-LCD-67",
+      categoryId: mobiles.id,
+      itemType: "RAW_MATERIAL",
+      uom: "PCS",
+      isSellable: false,
+      basePrice: 3000,
+      costPrice: 2500,
+      taxRatePct: 17,
+      status: "ACTIVE",
+      reorderPoint: 10,
+      reorderQty: 50,
+      leadTimeDays: 14,
+      shortDesc: "OLED display panel for phone repairs",
+    },
+  });
+
+  await prisma.inventoryStock.create({
+    data: { tenantId: tenant.id, productId: rawMaterial1.id, locationId: warehouse.id, qtyOnHand: 100 },
+  });
+
+  // Sample CONSUMABLE item
+  await prisma.product.create({
+    data: {
+      tenantId: tenant.id,
+      name: "Packaging Box (Medium)",
+      slug: "packaging-box-medium",
+      sku: "CON-BOX-M",
+      categoryId: mobiles.id,
+      itemType: "CONSUMABLE",
+      uom: "PCS",
+      isSellable: false,
+      basePrice: 50,
+      costPrice: 30,
+      taxRatePct: 17,
+      status: "ACTIVE",
+      reorderPoint: 100,
+      reorderQty: 500,
+      shortDesc: "Medium shipping box for electronics",
+    },
+  });
+
+  // Sample BUNDLE item
+  const bundle1 = await prisma.product.create({
+    data: {
+      tenantId: tenant.id,
+      name: "Samsung S24 Ultra Complete Package",
+      slug: "samsung-s24-ultra-package",
+      sku: "BND-S24U-PKG",
+      categoryId: mobiles.id,
+      itemType: "BUNDLE",
+      uom: "SET",
+      isTrackInventory: false,
+      basePrice: 399999,
+      costPrice: 355000,
+      taxRatePct: 17,
+      status: "ACTIVE",
+      isFeatured: true,
+      shortDesc: "Phone + screen protector + case bundle",
+    },
+  });
+
+  // Bundle components
+  await prisma.bundleItem.create({
+    data: { tenantId: tenant.id, bundleId: bundle1.id, componentId: product1.id, quantity: 1, sortOrder: 1 },
+  });
+
   // Create customer
   const customer = await prisma.customer.create({
     data: {

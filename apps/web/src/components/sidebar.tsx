@@ -8,7 +8,7 @@ import {
   DollarSign, UserCog, Settings, LogOut, ChevronDown, ChevronRight,
   FileText, CreditCard, BookOpen, Landmark,
   Clock, CalendarOff, Wallet, UsersRound,
-  Shield, MapPin, Building,
+  Shield, MapPin, Building, Tags,
 } from "lucide-react";
 import { cn } from "@wise/ui";
 import { useAuthStore } from "@/lib/store";
@@ -22,7 +22,13 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
-  { label: "Products", href: "/products", icon: Package },
+  {
+    label: "Inventory", href: "/products", icon: Package,
+    children: [
+      { label: "Item Master", href: "/products", icon: Package },
+      { label: "Categories", href: "/products/categories", icon: Tags },
+    ],
+  },
   { label: "Orders", href: "/orders", icon: ShoppingCart },
   { label: "Customers", href: "/customers", icon: Users },
   { label: "Vehicles", href: "/vehicles", icon: Car },

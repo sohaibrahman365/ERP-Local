@@ -52,6 +52,14 @@ enum ProductStatus {
   OUT_OF_STOCK
 }
 
+enum ItemType {
+  INVENTORY
+  SERVICE
+  RAW_MATERIAL
+  CONSUMABLE
+  BUNDLE
+}
+
 enum StockMovementType {
   PURCHASE_IN
   SALE_OUT
@@ -785,6 +793,22 @@ model Product {
   slug           String
   sku            String
   barcode        String?
+  itemType       ItemType      @default(INVENTORY)
+  uom            String        @default("PCS")
+  purchaseUom    String?
+  conversionFactor Decimal?    @db.Decimal(10, 4)
+  hsnCode        String?
+  isTrackInventory Boolean     @default(true)
+  isPurchasable  Boolean       @default(true)
+  isSellable     Boolean       @default(true)
+  reorderPoint   Int?
+  reorderQty     Int?
+  leadTimeDays   Int?
+  salesAccountId String?
+  purchaseAccountId String?
+  inventoryAccountId String?
+  minOrderQty    Decimal?      @db.Decimal(10, 2)
+  maxOrderQty    Decimal?      @db.Decimal(10, 2)
   categoryId     String
   brand          String?
   shortDesc      String?
@@ -810,14 +834,37 @@ model Product {
   updatedAt      DateTime      @updatedAt
   isDeleted      Boolean       @default(false)
 
-  category       Category         @relation(fields: [categoryId], references: [id])
-  variants       ProductVariant[]
-  images         ProductImage[]
-  inventoryStock InventoryStock[]
-  orderItems     OrderItem[]
+  category         Category         @relation(fields: [categoryId], references: [id])
+  variants         ProductVariant[]
+  images           ProductImage[]
+  inventoryStock   InventoryStock[]
+  orderItems       OrderItem[]
+  salesAccount     ChartOfAccount?  @relation("ProductSalesAccount", fields: [salesAccountId], references: [id])
+  purchaseAccount  ChartOfAccount?  @relation("ProductPurchaseAccount", fields: [purchaseAccountId], references: [id])
+  inventoryAccount ChartOfAccount?  @relation("ProductInventoryAccount", fields: [inventoryAccountId], references: [id])
+  bundleItems      BundleItem[]     @relation("BundleParent")
+  partOfBundles    BundleItem[]     @relation("BundleComponent")
 
   @@unique([tenantId, sku])
+  @@index([tenantId, itemType, status])
   @@map("products")
+}
+
+model BundleItem {
+  id          String   @id @default(uuid())
+  tenantId    String
+  bundleId    String
+  componentId String
+  quantity    Decimal  @db.Decimal(10, 2)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  bundle    Product @relation("BundleParent", fields: [bundleId], references: [id])
+  component Product @relation("BundleComponent", fields: [componentId], references: [id])
+
+  @@unique([tenantId, bundleId, componentId])
+  @@map("bundle_items")
 }
 
 model ProductVariant {
@@ -1292,9 +1339,12 @@ model ChartOfAccount {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
-  parent       ChartOfAccount?  @relation("AccountHierarchy", fields: [parentId], references: [id])
-  children     ChartOfAccount[] @relation("AccountHierarchy")
-  journalLines JournalLine[]
+  parent              ChartOfAccount?  @relation("AccountHierarchy", fields: [parentId], references: [id])
+  children            ChartOfAccount[] @relation("AccountHierarchy")
+  journalLines        JournalLine[]
+  productsSales       Product[]        @relation("ProductSalesAccount")
+  productsPurchase    Product[]        @relation("ProductPurchaseAccount")
+  productsInventory   Product[]        @relation("ProductInventoryAccount")
 
   @@unique([tenantId, code])
   @@map("chart_of_accounts")
