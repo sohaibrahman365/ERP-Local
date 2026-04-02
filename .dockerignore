@@ -1,0 +1,10 @@
+node_modules
+.next
+dist
+.turbo
+*.log
+.env
+.env.local
+.git
+.DS_Store
+apps/employee-app
