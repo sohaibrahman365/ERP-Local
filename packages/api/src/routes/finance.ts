@@ -8,14 +8,30 @@ import { validate } from "../middleware/validate";
 
 export const financeRouter = Router();
 
-// Chart of Accounts
+// ── Chart of Accounts ───────────────────────────────────────────────────────
+
 financeRouter.get("/accounts", authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const accounts = await prisma.chartOfAccount.findMany({
       where: { tenantId: req.user!.tenantId, isActive: true },
+      include: { parent: { select: { id: true, code: true, name: true } } },
       orderBy: { code: "asc" },
     });
     sendSuccess(res, accounts);
+  } catch (err) { next(err); }
+});
+
+financeRouter.get("/accounts/:id", authenticate, async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const account = await prisma.chartOfAccount.findFirst({
+      where: { id: req.params.id, tenantId: req.user!.tenantId },
+      include: {
+        parent: { select: { id: true, code: true, name: true } },
+        children: { select: { id: true, code: true, name: true, type: true } },
+      },
+    });
+    if (!account) { sendError(res, "Account not found", 404); return; }
+    sendSuccess(res, account);
   } catch (err) { next(err); }
 });
 
@@ -28,7 +44,49 @@ financeRouter.post("/accounts", authenticate, requirePermission("finance:write:a
   } catch (err) { next(err); }
 });
 
-// Journal Entries
+financeRouter.patch("/accounts/:id", authenticate, requirePermission("finance:write:all"), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const existing = await prisma.chartOfAccount.findFirst({
+      where: { id: req.params.id, tenantId: req.user!.tenantId },
+    });
+    if (!existing) { sendError(res, "Account not found", 404); return; }
+
+    const { code, name, type, parentId, isHeader, normalBalance, currency, description } = req.body;
+    const account = await prisma.chartOfAccount.update({
+      where: { id: req.params.id },
+      data: {
+        ...(code !== undefined && { code }),
+        ...(name !== undefined && { name }),
+        ...(type !== undefined && { type }),
+        ...(parentId !== undefined && { parentId: parentId || null }),
+        ...(isHeader !== undefined && { isHeader }),
+        ...(normalBalance !== undefined && { normalBalance }),
+        ...(currency !== undefined && { currency }),
+        ...(description !== undefined && { description }),
+      },
+    });
+    sendSuccess(res, account);
+  } catch (err) { next(err); }
+});
+
+financeRouter.delete("/accounts/:id", authenticate, requirePermission("finance:write:all"), async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const existing = await prisma.chartOfAccount.findFirst({
+      where: { id: req.params.id, tenantId: req.user!.tenantId },
+    });
+    if (!existing) { sendError(res, "Account not found", 404); return; }
+
+    // Soft-delete by deactivating
+    await prisma.chartOfAccount.update({
+      where: { id: req.params.id },
+      data: { isActive: false },
+    });
+    sendSuccess(res, { message: "Account deleted" });
+  } catch (err) { next(err); }
+});
+
+// ── Journal Entries ─────────────────────────────────────────────────────────
+
 financeRouter.get("/journal-entries", authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { page, pageSize } = paginationSchema.parse(req.query);
@@ -113,7 +171,8 @@ financeRouter.patch("/journal-entries/:id/post", authenticate, requirePermission
   } catch (err) { next(err); }
 });
 
-// Invoices
+// ── Invoices ────────────────────────────────────────────────────────────────
+
 financeRouter.get("/invoices", authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { page, pageSize } = paginationSchema.parse(req.query);
@@ -185,7 +244,8 @@ financeRouter.post("/invoices", authenticate, requirePermission("finance:write:a
   } catch (err) { next(err); }
 });
 
-// Payments
+// ── Payments ────────────────────────────────────────────────────────────────
+
 financeRouter.get("/payments", authenticate, async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { page, pageSize } = paginationSchema.parse(req.query);
@@ -243,7 +303,8 @@ financeRouter.post("/payments", authenticate, requirePermission("finance:write:a
   } catch (err) { next(err); }
 });
 
-// Financial Reports
+// ── Financial Reports ───────────────────────────────────────────────────────
+
 financeRouter.get("/reports/trial-balance", authenticate, requirePermission("finance:read:all"), async (req: Request, res: Response, next: NextFunction) => {
   try {
     const accounts = await prisma.chartOfAccount.findMany({

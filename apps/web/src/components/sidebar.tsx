@@ -6,7 +6,7 @@ import { useState } from "react";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Car, Building2,
   DollarSign, UserCog, Settings, LogOut, ChevronDown, ChevronRight,
-  FileText, CreditCard, BookOpen, Landmark,
+  FileText, CreditCard, BookOpen, Landmark, BarChart3, TrendingUp,
   Clock, CalendarOff, Wallet, UsersRound,
   Shield, MapPin, Building, Tags,
 } from "lucide-react";
@@ -41,6 +41,8 @@ const navItems: NavItem[] = [
       { label: "Payments", href: "/finance/payments", icon: CreditCard },
       { label: "Accounts", href: "/finance/accounts", icon: Landmark },
       { label: "Journal Entries", href: "/finance/journal-entries", icon: BookOpen },
+      { label: "Trial Balance", href: "/finance/reports/trial-balance", icon: BarChart3 },
+      { label: "Profit & Loss", href: "/finance/reports/profit-loss", icon: TrendingUp },
     ],
   },
   {

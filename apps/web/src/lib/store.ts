@@ -31,7 +31,9 @@ export const useAuthStore = create<AuthState>()(
       },
       logout: () => {
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("wise-auth");
         set({ user: null, tenant: null, accessToken: null });
+        window.location.href = "/login";
       },
     }),
     { name: "wise-auth" }
