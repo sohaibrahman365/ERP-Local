@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import {
@@ -100,9 +100,9 @@ export default function NewJournalEntryPage() {
     );
   }
 
-  const totalDebit = lines.reduce((sum, l) => sum + Number(l.debitAmount), 0);
-  const totalCredit = lines.reduce((sum, l) => sum + Number(l.creditAmount), 0);
-  const isBalanced = Math.abs(totalDebit - totalCredit) < 0.01 && totalDebit > 0;
+  const totalDebit = useMemo(() => lines.reduce((sum, l) => sum + Number(l.debitAmount), 0), [lines]);
+  const totalCredit = useMemo(() => lines.reduce((sum, l) => sum + Number(l.creditAmount), 0), [lines]);
+  const isBalanced = totalDebit > 0 && Math.abs(totalDebit - totalCredit) < 0.01;
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -128,11 +128,6 @@ export default function NewJournalEntryPage() {
       description,
       lines: validLines,
     });
-  }
-
-  function getAccountLabel(accountId: string): string {
-    const acc = accounts.find((a) => a.id === accountId);
-    return acc ? `${acc.code} - ${acc.name}` : "";
   }
 
   return (

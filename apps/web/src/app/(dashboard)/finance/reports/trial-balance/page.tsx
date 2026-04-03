@@ -46,8 +46,9 @@ export default function TrialBalancePage() {
   });
 
   const rows: TrialBalanceRow[] = data?.data ?? [];
-  const totalDebit = rows.reduce((sum, r) => sum + Math.max(r.balance, 0), 0);
-  const totalCredit = rows.reduce((sum, r) => sum + Math.abs(Math.min(r.balance, 0)), 0);
+  const activeRows = rows.filter((r) => r.debit > 0 || r.credit > 0);
+  const totalDebit = activeRows.reduce((sum, r) => sum + Math.max(r.balance, 0), 0);
+  const totalCredit = activeRows.reduce((sum, r) => sum + Math.abs(Math.min(r.balance, 0)), 0);
 
   return (
     <div className="space-y-6">
@@ -71,9 +72,7 @@ export default function TrialBalancePage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows
-                .filter((r) => r.debit > 0 || r.credit > 0)
-                .map((row) => (
+              {activeRows.map((row) => (
                   <TableRow key={row.code}>
                     <TableCell className="font-mono font-medium">{row.code}</TableCell>
                     <TableCell className="font-medium">{row.name}</TableCell>
@@ -90,7 +89,7 @@ export default function TrialBalancePage() {
                     </TableCell>
                   </TableRow>
                 ))}
-              {!isLoading && rows.filter((r) => r.debit > 0 || r.credit > 0).length === 0 && (
+              {!isLoading && activeRows.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                     No posted journal entries yet. Post journal entries to see the trial balance.
@@ -105,7 +104,7 @@ export default function TrialBalancePage() {
                 </TableRow>
               )}
               {/* Totals */}
-              {rows.filter((r) => r.debit > 0 || r.credit > 0).length > 0 && (
+              {activeRows.length > 0 && (
                 <TableRow className="border-t-2 font-bold bg-muted/50">
                   <TableCell colSpan={3} className="text-right">Totals</TableCell>
                   <TableCell className="text-right">PKR {totalDebit.toLocaleString()}</TableCell>

@@ -476,9 +476,9 @@ export default function ChartOfAccountsPage() {
           <DialogHeader>
             <DialogTitle>Delete Account</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete account{" "}
+              Are you sure you want to deactivate account{" "}
               <strong>{deletingAccount?.code} - {deletingAccount?.name}</strong>?
-              This action cannot be undone.
+              It will be hidden from future selections.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>

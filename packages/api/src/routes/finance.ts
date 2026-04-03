@@ -46,14 +46,9 @@ financeRouter.post("/accounts", authenticate, requirePermission("finance:write:a
 
 financeRouter.patch("/accounts/:id", authenticate, requirePermission("finance:write:all"), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const existing = await prisma.chartOfAccount.findFirst({
-      where: { id: req.params.id, tenantId: req.user!.tenantId },
-    });
-    if (!existing) { sendError(res, "Account not found", 404); return; }
-
     const { code, name, type, parentId, isHeader, normalBalance, currency, description } = req.body;
-    const account = await prisma.chartOfAccount.update({
-      where: { id: req.params.id },
+    const account = await prisma.chartOfAccount.updateMany({
+      where: { id: req.params.id, tenantId: req.user!.tenantId },
       data: {
         ...(code !== undefined && { code }),
         ...(name !== undefined && { name }),
@@ -65,23 +60,20 @@ financeRouter.patch("/accounts/:id", authenticate, requirePermission("finance:wr
         ...(description !== undefined && { description }),
       },
     });
-    sendSuccess(res, account);
+    if (account.count === 0) { sendError(res, "Account not found", 404); return; }
+    const updated = await prisma.chartOfAccount.findUnique({ where: { id: req.params.id } });
+    sendSuccess(res, updated);
   } catch (err) { next(err); }
 });
 
 financeRouter.delete("/accounts/:id", authenticate, requirePermission("finance:write:all"), async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const existing = await prisma.chartOfAccount.findFirst({
+    const result = await prisma.chartOfAccount.updateMany({
       where: { id: req.params.id, tenantId: req.user!.tenantId },
-    });
-    if (!existing) { sendError(res, "Account not found", 404); return; }
-
-    // Soft-delete by deactivating
-    await prisma.chartOfAccount.update({
-      where: { id: req.params.id },
       data: { isActive: false },
     });
-    sendSuccess(res, { message: "Account deleted" });
+    if (result.count === 0) { sendError(res, "Account not found", 404); return; }
+    sendSuccess(res, { message: "Account deactivated" });
   } catch (err) { next(err); }
 });
 

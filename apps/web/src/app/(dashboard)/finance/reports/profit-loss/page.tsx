@@ -39,6 +39,8 @@ export default function ProfitLossPage() {
   });
 
   const pl: PLData | null = data?.data ?? null;
+  const activeRevenue = pl?.revenue.filter((r) => r.amount !== 0) ?? [];
+  const activeExpenses = pl?.expenses.filter((r) => r.amount !== 0) ?? [];
 
   return (
     <div className="space-y-6">
@@ -108,7 +110,7 @@ export default function ProfitLossPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {pl.revenue.filter((r) => r.amount !== 0).map((row) => (
+                  {activeRevenue.map((row) => (
                     <TableRow key={row.code}>
                       <TableCell className="font-mono">{row.code}</TableCell>
                       <TableCell>{row.name}</TableCell>
@@ -117,7 +119,7 @@ export default function ProfitLossPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {pl.revenue.filter((r) => r.amount !== 0).length === 0 && (
+                  {activeRevenue.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={3} className="text-center py-4 text-muted-foreground">
                         No revenue recorded yet
@@ -148,7 +150,7 @@ export default function ProfitLossPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {pl.expenses.filter((r) => r.amount !== 0).map((row) => (
+                  {activeExpenses.map((row) => (
                     <TableRow key={row.code}>
                       <TableCell className="font-mono">{row.code}</TableCell>
                       <TableCell>{row.name}</TableCell>
@@ -157,7 +159,7 @@ export default function ProfitLossPage() {
                       </TableCell>
                     </TableRow>
                   ))}
-                  {pl.expenses.filter((r) => r.amount !== 0).length === 0 && (
+                  {activeExpenses.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={3} className="text-center py-4 text-muted-foreground">
                         No expenses recorded yet
